@@ -12,7 +12,7 @@ BASE_URL = "https://www.fiverr.com/"
 
 CATEGORY_URL = "categories"
 CATEGORY_FILE = "./data/categories.json"
-ALREADY_PARSED =".data/alread_processed.json"
+ALREADY_PARSED ="./data/alread_processed.json"
 OUTPUT_FILE = "./data/output.csv"
 
 def get_web_response (url, filter) :
