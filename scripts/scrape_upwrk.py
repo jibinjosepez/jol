@@ -8,7 +8,7 @@ import json
 import csv
 import time
 
-BASE_URL = "https://www.fiverr.com/"
+BASE_URL = "https://www.fiverr.com"
 
 CATEGORY_URL = "categories"
 CATEGORY_FILE = "./data/categories.json"
@@ -145,7 +145,7 @@ def main () :
                         writer.writerow(row)
                     already_parsed.add(tuples[1])
                     update_already_parsed(tuples[1])
-                    time.sleep(30)
+                    time.sleep(60)
     f.close()
 
 main()
