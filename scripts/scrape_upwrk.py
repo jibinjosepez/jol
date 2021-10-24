@@ -100,11 +100,11 @@ def get_categories() :
 
 def parse_job_helper(url) :
     output = []
-    for page_id in range(1, 3) :
-        end = "?source=toggle_filters&ref=pro%3Aany%7Csubscription%3Atrue&page=" + str(page_id)
-        output.extend(parse_job(url, end))
-    return output
-
+    # for page_id in range(1, 3) :
+    end = "?source=toggle_filters&ref=pro%3Aany%7Csubscription%3Atrue&page=" + str(page_id)
+    output.extend(parse_job(url, end))
+    # return output
+# 
 def get_already_parsed():
     lines = []
     with open(ALREADY_PARSED, 'r') as f:
