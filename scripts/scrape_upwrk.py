@@ -145,7 +145,7 @@ def main () :
                         writer.writerow(row)
                     already_parsed.add(tuples[1])
                     update_already_parsed(tuples[1])
-                    time.sleep(60)
+                    time.sleep(50)
     f.close()
 
 main()
