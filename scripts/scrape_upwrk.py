@@ -101,6 +101,7 @@ def get_categories() :
 def parse_job_helper(url) :
     output = []
     # for page_id in range(1, 3) :
+    page_id = 1
     end = "?source=toggle_filters&ref=pro%3Aany%7Csubscription%3Atrue&page=" + str(page_id)
     output.extend(parse_job(url, end))
     # return output
