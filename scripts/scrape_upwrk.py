@@ -2,6 +2,7 @@
 # change above line to point to local
 # python executable
 
+import random
 import traceback
 import requests
 from bs4 import BeautifulSoup
@@ -22,21 +23,21 @@ def get_web_response (url, filter) :
     print ('Getting Url: {}'.format(url))
     if (filter) :
         url = url + filter
-    headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
-            'Dnt': '1',
-            'Host': 'httpbin.org',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) '
-                           'AppleWebKit/537.36 (KHTML, like Gecko) '
-                           'Chrome/83.0.4103.97 Safari/537.36',
-            'X-Amzn-Trace-Id': 'Root=1-5ee7bbec-779382315873aa33227a5df6'
+    user_agent = ['PostmanRuntime/7.26.8', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.816', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:93.0) Gecko/20100101 Firefox/93.0']
+
+    retry = 0
+    status = True
+    while retry<=5:
+        headers = {
+                'User-Agent': random.choice(user_agent)
              }
-    req = requests.get(url, headers=headers)
+        req = requests.get(url, headers=headers)
+        if (req.status_code) == 403:
+            print ('---------status_code--------------------', req.status_code)
+            retry = retry+1
+            time.sleep(30*retry)
     soup = BeautifulSoup(req.content, 'lxml')
-    return soup
+    return soup, status
 
 
 def parse_categories(url):
@@ -158,6 +159,6 @@ def main () :
                             writer.writerow(row)
                         already_parsed.add(tuples[1])
                         update_already_parsed(tuples[1])
-                        time.sleep(20)
+                        time.sleep(5)
 
 main()
