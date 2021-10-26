@@ -2,6 +2,8 @@
 # change above line to point to local
 # python executable
 
+import traceback
+import requests
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import json 
@@ -17,13 +19,25 @@ OUTPUT_FILE = "./data/output.csv"
 
 def get_web_response (url, filter) :
     url = BASE_URL + url 
+    print ('Getting Url: {}'.format(url))
     if (filter) :
         url = url + filter
-    print(url)
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'})
-    webpage = urlopen(req).read()
-    soup = BeautifulSoup(webpage)
+    headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+            'Dnt': '1',
+            'Host': 'httpbin.org',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) '
+                           'AppleWebKit/537.36 (KHTML, like Gecko) '
+                           'Chrome/83.0.4103.97 Safari/537.36',
+            'X-Amzn-Trace-Id': 'Root=1-5ee7bbec-779382315873aa33227a5df6'
+             }
+    req = requests.get(url, headers=headers)
+    soup = BeautifulSoup(req.content, 'lxml')
     return soup
+
 
 def parse_categories(url):
     output = {}
@@ -55,9 +69,7 @@ def parse_job(url, end) :
     try :
         soup = get_web_response(url, end).find_all("div", class_="gig-card-layout")
     except Exception as ex :
-        if ex.status == 403:
-            print ("Error")
-            raise ex
+        print ('--------Exception--------', traceback.format_exc())
         return []
     output = []
     text = rate = price = None
@@ -104,7 +116,7 @@ def parse_job_helper(url) :
     page_id = 1
     end = "?source=toggle_filters&ref=pro%3Aany%7Csubscription%3Atrue&page=" + str(page_id)
     output.extend(parse_job(url, end))
-    # return output
+    return output
 # 
 def get_already_parsed():
     lines = []
@@ -128,25 +140,24 @@ def main () :
     
     already_parsed = set(already_parsed)
 
-    f = open(OUTPUT_FILE, 'a')
-    writer = csv.writer(f)
-    i = 100
-    for key1, val in categories.items() :
-        firstSkipped = False 
-        for key2, val2 in val.items():
-            for tuples in val2:
-                if len(val2) > 1 and not firstSkipped:
-                    firstSkipped =  True
-                    next
-                if  tuples[1] not in already_parsed :
-                    output = parse_job_helper(tuples[1])
-                    for dat in output :
-                        row = [key1, key2, tuples[1]]
-                        row.extend(dat)
-                        writer.writerow(row)
-                    already_parsed.add(tuples[1])
-                    update_already_parsed(tuples[1])
-                    time.sleep(60)
-    f.close()
+    with open(OUTPUT_FILE, 'a') as f:
+        writer = csv.writer(f)
+        i = 100
+        for key1, val in categories.items() :
+            firstSkipped = False 
+            for key2, val2 in val.items():
+                for tuples in val2:
+                    if len(val2) > 1 and not firstSkipped:
+                        firstSkipped =  True
+                        next
+                    if  tuples[1] not in already_parsed :
+                        output = parse_job_helper(tuples[1])
+                        for dat in output :
+                            row = [key1, key2, tuples[1]]
+                            row.extend(dat)
+                            writer.writerow(row)
+                        already_parsed.add(tuples[1])
+                        update_already_parsed(tuples[1])
+                        time.sleep(20)
 
 main()
