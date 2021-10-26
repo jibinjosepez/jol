@@ -153,7 +153,7 @@ def main () :
                     if  tuples[1] not in already_parsed :
                         output = parse_job_helper(tuples[1])
                         for dat in output :
-                            row = [key1, key2, tuples[1]]
+                            row = [key1, key2, tuples[0], tuples[1]]
                             row.extend(dat)
                             writer.writerow(row)
                         already_parsed.add(tuples[1])
